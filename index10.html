@@ -831,7 +831,7 @@
             Qual é a sua necessidade ou preferência para personalizarmos a sua navegação agora?
           </p>
         </div>
-
+        <div class="modal-opcoes" role="group" aria-label="Opções de perfil de acessibilidade">
           <button type="button"
                   class="btn-perfil padrao"
                   onclick="selecionarPerfil('padrao')"
@@ -843,7 +843,6 @@
             </span>
           </button>
 
-        <div class="modal-opcoes" role="group" aria-label="Opções de perfil de acessibilidade">
           <button type="button"
                   class="btn-perfil"
                   onclick="selecionarPerfil('visual')"
@@ -1135,7 +1134,117 @@
         <script>
           let tamanho = 18;
           let falaAtiva = true;
-          let boasVindasFalada = false;
+          let audioDesbloqueado = false;
+          let vozPtBR = null;
+          let falaPendente = "";
+
+          /* =========================================
+             PRÉ-CARREGAMENTO INSTANTÂNEO DA VOZ PT-BR
+             ========================================= */
+          function carregarVozes() {
+            if (!('speechSynthesis' in window)) return;
+            const vozes = window.speechSynthesis.getVoices();
+            if (vozes.length > 0) {
+              vozPtBR =
+                vozes.find(v => v.lang === 'pt-BR' && v.localService) ||
+                vozes.find(v => v.lang.startsWith('pt')) ||
+                vozes[0];
+            }
+          }
+
+          if ('speechSynthesis' in window) {
+            carregarVozes();
+            window.speechSynthesis.onvoiceschanged = carregarVozes;
+          }
+
+          /* =========================================
+             SÍNTESE DE VOZ (TTS) SEM ATRASO
+             ========================================= */
+          function falarTexto(texto, imediato = false) {
+            if (!falaAtiva || !('speechSynthesis' in window)) return;
+            if (!texto || texto.trim() === '') return;
+
+            const synth = window.speechSynthesis;
+
+            // Evita chamar cancel() se já estiver ocioso (elimina atraso de ~500ms no Chrome/Edge)
+            if (synth.speaking || synth.pending) {
+              synth.cancel();
+            }
+
+            const mensagem = new SpeechSynthesisUtterance(texto.trim());
+            mensagem.lang = 'pt-BR';
+            if (vozPtBR) mensagem.voice = vozPtBR;
+            mensagem.rate = 1.2;
+
+            mensagem.onstart = () => {
+              audioDesbloqueado = true;
+              falaPendente = "";
+            };
+
+            mensagem.onerror = () => {
+              // Guarda o texto se o navegador ainda estiver bloqueando áudio sem gesto
+              if (!audioDesbloqueado) {
+                falaPendente = texto.trim();
+              }
+            };
+
+            falaPendente = texto.trim();
+            synth.speak(mensagem);
+          }
+
+          function pararFala() {
+            if ('speechSynthesis' in window) {
+              const synth = window.speechSynthesis;
+              if (synth.speaking || synth.pending) {
+                synth.cancel();
+              }
+            }
+          }
+
+          function obterTextoParaFala(elemento) {
+            return elemento.getAttribute('aria-label') || elemento.innerText;
+          }
+
+          function tratarLeituraElemento(e) {
+            e.stopPropagation();
+            falarTexto(obterTextoParaFala(e.currentTarget));
+          }
+
+          function vincularEventosDeFala() {
+            const elementosDeTexto = document.querySelectorAll(
+              'h1, h2, h3, p, a, button, li, label, #modalTitulo, #modalDescricao'
+            );
+
+            elementosDeTexto.forEach(elemento => {
+              elemento.removeEventListener('mouseenter', tratarLeituraElemento);
+              elemento.removeEventListener('mouseleave', pararFala);
+              elemento.removeEventListener('focus', tratarLeituraElemento);
+              elemento.removeEventListener('blur', pararFala);
+
+              elemento.addEventListener('mouseenter', tratarLeituraElemento);
+              elemento.addEventListener('mouseleave', pararFala);
+              elemento.addEventListener('focus', tratarLeituraElemento);
+              elemento.addEventListener('blur', pararFala);
+            });
+          }
+
+          /* Libera o áudio instantaneamente no primeiro gesto real (tecla ou clique/toque) */
+          function desbloquearAudioNoPrimeiroGesto(e) {
+            if (audioDesbloqueado || !falaAtiva) return;
+            audioDesbloqueado = true;
+
+            window.removeEventListener("pointerdown", desbloquearAudioNoPrimeiroGesto, true);
+            window.removeEventListener("keydown", desbloquearAudioNoPrimeiroGesto, true);
+
+            // Pequeno tick para deixar o evento focus/click atual definir qual texto falar
+            setTimeout(() => {
+              if (!falaAtiva) return;
+              const synth = window.speechSynthesis;
+              if (synth && !synth.speaking && falaPendente) {
+                falarTexto(falaPendente);
+              }
+            }, 10);
+          }
 
           /* =========================================
              CONTROLE DO MODAL DE BOAS-VINDAS E PERFIS
@@ -1360,78 +1469,6 @@
             });
 
           /* =========================================
-             SÍNTESE DE VOZ (TTS) E EVENTOS DE LEITURA
-             ========================================= */
-          function falarTexto(texto) {
-            if (!falaAtiva) return;
-
-            if ('speechSynthesis' in window) {
-              window.speechSynthesis.cancel();
-
-              if (!texto || texto.trim() === '') return;
-
-              const mensagem = new SpeechSynthesisUtterance(texto);
-              mensagem.lang = 'pt-BR';
-              mensagem.rate = 1.15;
-              
-              window.speechSynthesis.speak(mensagem);
-            }
-          }
-
-          function pararFala() {
-            if ('speechSynthesis' in window) {
-              window.speechSynthesis.cancel();
-            }
-          }
-
-          function obterTextoParaFala(elemento) {
-            return elemento.getAttribute('aria-label') || elemento.innerText;
-          }
-
-          function tratarLeituraElemento(e) {
-            e.stopPropagation();
-            falarTexto(obterTextoParaFala(e.currentTarget));
-          }
-
-          function vincularEventosDeFala() {
-            const elementosDeTexto = document.querySelectorAll(
-              'h1, h2, h3, p, a, button, li, label, #modalTitulo, #modalDescricao'
-            );
-
-            elementosDeTexto.forEach(elemento => {
-              elemento.removeEventListener('mouseenter', tratarLeituraElemento);
-              elemento.removeEventListener('mouseleave', pararFala);
-              elemento.removeEventListener('focus', tratarLeituraElemento);
-              elemento.removeEventListener('blur', pararFala);
-
-              elemento.addEventListener('mouseenter', tratarLeituraElemento);
-              elemento.addEventListener('mouseleave', pararFala);
-              elemento.addEventListener('focus', tratarLeituraElemento);
-              elemento.addEventListener('blur', pararFala);
-            });
-          }
-
-          /* Desbloqueia e dispara boas-vindas por voz na primeira interação (clique ou tecla) */
-          function dispararBoasVindasInicial(e) {
-            if (boasVindasFalada || !falaAtiva) return;
-            boasVindasFalada = true;
-
-            window.removeEventListener("pointerdown", dispararBoasVindasInicial);
-            window.removeEventListener("keydown", dispararBoasVindasInicial);
-
-            if (!modalBoasVindas.classList.contains("oculto")) {
-              const focoAtual = document.activeElement;
-              if (focoAtual && modalBoasVindas.contains(focoAtual) && focoAtual !== document.body) {
-                falarTexto("Bem-vindo ao Acesso para Todos. " + obterTextoParaFala(focoAtual));
-              } else {
-                falarTexto(
-                  "Bem-vindo ao Acesso para Todos! Qual é a sua necessidade ou preferência para personalizarmos a sua navegação? Use a tecla Tab para ouvir as opções."
-                );
-              }
-            }
-          }
-
-          /* =========================================
              CHAT ASSISTENTE PARA SURDOS
              ========================================= */
           const chatMensagens = document.getElementById("chatMensagens");
@@ -1526,24 +1563,23 @@
           });
 
           /* =========================================
-             INICIALIZAÇÃO
+             INICIALIZAÇÃO IMEDIATA
              ========================================= */
+          // Registra desbloqueio antes mesmo do DOMContentLoaded para capturar o 1º gesto sem atraso
+          window.addEventListener("pointerdown", desbloquearAudioNoPrimeiroGesto, true);
+          window.addEventListener("keydown", desbloquearAudioNoPrimeiroGesto, true);
+
           window.addEventListener("DOMContentLoaded", () => {
+            carregarVozes();
+            definirEstadoFala(true);
             carregarVoluntarios();
             vincularEventosDeFala();
             abrirModalBoasVindas();
 
-            // Tenta falar imediatamente caso o navegador permita áudio sem gesto prévio
             falarTexto(
               "Bem-vindo ao Acesso para Todos! Qual é a sua necessidade ou preferência para personalizarmos a sua navegação?"
             );
-
-            // Garante a fala na primeira interação caso o navegador bloqueie o autoplay
-            window.addEventListener("pointerdown", dispararBoasVindasInicial);
-            window.addEventListener("keydown", dispararBoasVindasInicial);
           });
         </script>
 </body>
 </html>
-
-```
