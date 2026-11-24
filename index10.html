@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌐 Acesso para Todos | Inclusão Digital 🚀</title>
+
+  <style>
+    :root {
+      --fundo: #f4f8f9;
+      --texto: #1e293b;
+      --cartao: #ffffff;
+      
+      --vermelho: #31d418;
+      --vermelho-escuro: #0015ff;
+      --vermelho-claro: #ffebee;
+      
+      --ciano: #00b4d8;
+      --ciano-escuro: #0077b6;
+      --ciano-claro: #e0f7fa;
+
+      --sombra: 0 10px 30px rgba(230, 57, 70, 0.08);
+      --borda-suave: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--fundo);
+      color: var(--texto);
+      font-size: 18px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* =========================================
+       MODAL DE BOAS-VINDAS (TELA INICIAL)
+       ========================================= */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 10000;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.oculto {
+      display: none;
+    }
+
+    .modal-conteudo {
+      background: var(--cartao);
+      color: var(--texto);
+      max-width: 720px;
+      width: 100%;
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 3px solid var(--ciano);
+      max-height: 92vh;
+      overflow-y: auto;
+      animation: aparecer 0.3s ease;
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      font-size: 1.85rem;
+      color: var(--vermelho-escuro);
+      margin: 0 0 10px;
+    }
+
+    .modal-header p {
+      margin: 0;
+      font-size: 1.05rem;
+      opacity: 0.9;
+    }
+
+    .modal-opcoes {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .btn-perfil {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      margin: 0;
+      padding: 18px 22px;
+      text-align: left;
+      background: #f8fafc;
+      color: var(--texto);
+      border: 2px solid var(--borda-suave);
+      border-radius: 16px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.2s ease;
+    }
+
+    .btn-perfil:hover,
+    .btn-perfil:focus-visible {
+      background: var(--ciano-claro);
+      border-color: var(--ciano-escuro);
+      color: #0f172a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 180, 216, 0.2);
+    }
+
+    .btn-perfil:focus-visible {
+      outline: 4px solid var(--vermelho-escuro);
+      outline-offset: 3px;
+    }
+
+    .btn-perfil .perfil-icone {
+      font-size: 2rem;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .btn-perfil .perfil-texto {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .btn-perfil .perfil-titulo {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--vermelho-escuro);
+    }
+
+    .btn-perfil .perfil-desc {
+      font-size: 0.9rem;
+      font-weight: 400;
+      opacity: 0.85;
+    }
+
+    .btn-perfil.padrao {
+      background: linear-gradient(135deg, var(--vermelho) 0%, var(--vermelho-escuro) 100%);
+      color: #ffffff;
+      border-color: transparent;
+      margin-top: 6px;
+    }
+
+    .btn-perfil.padrao .perfil-titulo {
+      color: #ffffff;
+    }
+
+    .btn-perfil.padrao:hover,
+    .btn-perfil.padrao:focus-visible {
+      background: var(--vermelho-escuro);
+      color: #ffffff;
+    }
+
+    /* Alto Contraste aplicado também ao Modal */
+    .alto-contraste .modal-conteudo {
+      background: #111;
+      color: #fff;
+      border-color: #00f0ff;
+    }
+
+    .alto-contraste .modal-header h2 {
+      color: #00f0ff;
+    }
+
+    .alto-contraste .btn-perfil {
+      background: #000;
+      color: #fff;
+      border-color: #00f0ff;
+    }
+
+    .alto-contraste .btn-perfil .perfil-titulo {
+      color: #00f0ff;
+    }
+
+    .alto-contraste .btn-perfil:hover,
+    .alto-contraste .btn-perfil:focus-visible {
+      background: #00f0ff;
+      color: #000;
+    }
+
+    .alto-contraste .btn-perfil:hover .perfil-titulo,
+    .alto-contraste .btn-perfil:focus-visible .perfil-titulo {
+      color: #000;
+    }
+
+    /* =========================================
+       MODOS DE PERFIL ESPECÍFICOS (MOTORA / LEITURA)
+       ========================================= */
+    body.modo-motor button,
+    body.modo-motor nav a,
+    body.modo-motor input,
+    body.modo-motor select,
+    body.modo-motor textarea {
+      padding: 20px 28px !important;
+      margin: 12px 12px 12px 0 !important;
+      min-height: 60px;
+      font-size: 1.12rem;
+    }
+
+    body.modo-motor nav {
+      gap: 20px;
+    }
+
+    body.modo-motor .botoes-rapidos {
+      gap: 16px;
+    }
+
+    body.modo-motor *:focus-visible {
+      outline: 5px solid #ff9800 !important;
+      outline-offset: 4px !important;
+      box-shadow: 0 0 0 8px rgba(255, 152, 0, 0.3) !important;
+    }
+
+    body.modo-leitura {
+      line-height: 2.15 !important;
+      letter-spacing: 0.04em;
+      word-spacing: 0.12em;
+    }
+
+    body.modo-leitura p,
+    body.modo-leitura li,
+    body.modo-leitura label {
+      max-width: 72ch;
+      line-height: 2.15 !important;
+    }
+
+    /* =========================================
+       ESTILOS ORIGINAIS DO SITE
+       ========================================= */
+    header {
+      background: linear-gradient(135deg, var(--vermelho) 0%, var(--vermelho-escuro) 100%);
+      color: white;
+      padding: 48px 24px 32px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(230, 57, 70, 0.25);
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      margin: 0 0 8px;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+    }
+
+    header p {
+      font-size: 1.15rem;
+      margin: 0 0 24px;
+      opacity: 0.95;
+      font-weight: 300;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 22px;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(4px);
+      font-weight: 600;
+      transition: all 0.25s ease;
+      font-size: 0.95rem;
+      display: inline-block;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    nav a:hover {
+      background: var(--ciano);
+      border-color: var(--ciano);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);
+    }
+
+    main {
+      width: 90%;
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px 0 40px;
+    }
+
+    section {
+      margin: 32px 0;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      color: var(--vermelho-escuro);
+      margin: 0 0 10px;
+      letter-spacing: -0.3px;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      color: var(--vermelho);
+      margin: 0 0 8px;
+    }
+
+    .ferramentas,
+    .cartao {
+      background: var(--cartao);
+      padding: 32px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      border: 1px solid var(--borda-suave);
+      box-shadow: var(--sombra);
+      transition: all 0.3s ease;
+    }
+
+    .cartao:hover {
+      box-shadow: 0 12px 32px rgba(0, 180, 216, 0.15);
+      border-color: var(--ciano-claro);
+    }
+
+    button {
+      padding: 14px 22px;
+      margin: 6px 6px 6px 0;
+      border: none;
+      border-radius: 12px;
+      background: var(--vermelho);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+      letter-spacing: 0.2px;
+      box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
+    }
+
+    button:hover {
+      background: var(--vermelho-escuro);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(230, 57, 70, 0.35);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .ferramentas button {
+      width: auto;
+    }
+
+    button.btn-reabrir-modal {
+      background: var(--ciano-escuro);
+    }
+
+    button.btn-reabrir-modal:hover {
+      background: var(--ciano);
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    [tabindex="0"]:focus-visible {
+      outline: 4px solid var(--ciano);
+      outline-offset: 3px;
+    }
+
+    .alto-contraste {
+      background: #000;
+      color: #fff;
+    }
+
+    .alto-contraste .cartao,
+    .alto-contraste .ferramentas {
+      background: #111;
+      color: #fff;
+      border: 2px solid #00f0ff;
+      box-shadow: none;
+    }
+
+    .alto-contraste h2,
+    .alto-contraste h3 {
+      color: #00f0ff;
+    }
+
+    .alto-contraste input,
+    .alto-contraste select,
+    .alto-contraste textarea {
+      background: #000;
+      color: #fff;
+      border-color: #00f0ff;
+    }
+
+    .alto-contraste button {
+      background: #00f0ff;
+      color: #000;
+      border: none;
+      box-shadow: none;
+    }
+
+    .alto-contraste button:hover {
+      background: #70f8ff;
+    }
+
+    .campo {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      color: var(--vermelho-escuro);
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--borda-suave);
+      border-radius: 12px;
+      font-size: 1rem;
+      background: #fafbfc;
+      color: var(--texto);
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--ciano);
+      box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.15);
+      background: #fff;
+      outline: none;
+    }
+
+    .grade {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .lista-cadastrados {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0;
+    }
+
+    .lista-cadastrados li {
+      padding: 14px 18px;
+      border-left: 4px solid var(--vermelho);
+      background: var(--vermelho-claro);
+      margin-bottom: 10px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+    }
+
+    .alto-contraste .lista-cadastrados li {
+      border-color: #00f0ff;
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    hr {
+      border: none;
+      border-top: 2px solid var(--borda-suave);
+      margin: 28px 0;
+    }
+
+    footer {
+      background: #0f172a;
+      color: #cbd5e1;
+      text-align: center;
+      padding: 32px 20px;
+      font-size: 0.95rem;
+      letter-spacing: 0.3px;
+      border-top: 4px solid var(--vermelho);
+    }
+
+    footer p {
+      margin: 0;
+    }
+
+    #aviso,
+    #respostaCadastro,
+    #resultado {
+      font-weight: 600;
+      color: var(--vermelho-escuro);
+      min-height: 1.5em;
+    }
+
+    .alto-contraste #aviso,
+    .alto-contraste #respostaCadastro,
+    .alto-contraste #resultado {
+      color: #00f0ff;
+    }
+
+    .assistente-surdez {
+      background: linear-gradient(135deg, var(--ciano-claro) 0%, #ffffff 100%);
+      border: 2px solid var(--ciano);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 25px rgba(0, 180, 216, 0.1);
+    }
+
+    .alto-contraste .assistente-surdez {
+      background: #001a24;
+      border-color: #00f0ff;
+    }
+
+    .assistente-surdez h2 {
+      color: var(--ciano-escuro);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alto-contraste .assistente-surdez h2 {
+      color: #00f0ff;
+    }
+
+    .assistente-surdez h3 {
+      color: var(--ciano-escuro);
+    }
+
+    .alto-contraste .assistente-surdez h3 {
+      color: #00f0ff;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 340px;
+      border: 2px solid var(--ciano);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      margin-top: 16px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    }
+
+    .alto-contraste .chat-container {
+      background: #000;
+      border-color: #00f0ff;
+    }
+
+    .chat-mensagens {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mensagem {
+      max-width: 80%;
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      animation: aparecer 0.3s ease;
+    }
+
+    @keyframes aparecer {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .mensagem.usuario {
+      align-self: flex-end;
+      background: var(--ciano);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .mensagem.assistente {
+      align-self: flex-start;
+      background: #f0f4f8;
+      color: #1e293b;
+      border-bottom-left-radius: 4px;
+      border-left: 4px solid var(--vermelho);
+    }
+
+    .alto-contraste .mensagem.assistente {
+      background: #1a2a3a;
+      color: #fff;
+      border-left-color: #00f0ff;
+    }
+
+    .mensagem .rotulo {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .chat-entrada {
+      display: flex;
+      border-top: 2px solid var(--ciano-claro);
+      background: #fff;
+    }
+
+    .alto-contraste .chat-entrada {
+      background: #000;
+      border-color: #00f0ff;
+    }
+
+    .chat-entrada input {
+      flex: 1;
+      border: none;
+      border-radius: 0;
+      padding: 14px 16px;
+      font-size: 1rem;
+      background: transparent;
+    }
+
+    .chat-entrada input:focus {
+      box-shadow: none;
+      border: none;
+      outline: none;
+    }
+
+    .chat-entrada button {
+      width: auto;
+      margin: 0;
+      border-radius: 0;
+      background: var(--ciano);
+      padding: 0 24px;
+      box-shadow: none;
+    }
+
+    .chat-entrada button:hover {
+      background: var(--ciano-escuro);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .alto-contraste .chat-entrada button {
+      background: #00f0ff;
+      color: #000;
+    }
+
+    .botoes-rapidos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .botoes-rapidos button {
+      width: auto;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      background: #fff;
+      color: var(--ciano-escuro);
+      border: 2px solid var(--ciano);
+      box-shadow: none;
+      border-radius: 20px;
+    }
+
+    .botoes-rapidos button:hover {
+      background: var(--ciano);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 180, 216, 0.2);
+    }
+
+    .alto-contraste .botoes-rapidos button {
+      background: #000;
+      color: #00f0ff;
+      border-color: #00f0ff;
+    }
+
+    .alerta-visual {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--ciano-escuro);
+      color: #fff;
+      text-align: center;
+      padding: 12px;
+      font-weight: 700;
+      z-index: 11000;
+      animation: piscar 1s ease 3;
+      display: none;
+    }
+
+    @keyframes piscar {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .libras-area {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .libras-card {
+      flex: 1;
+      min-width: 200px;
+      background: #fff;
+      border: 2px dashed var(--ciano);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+
+    .libras-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .alto-contraste .libras-card {
+      background: #000;
+      border-color: #00f0ff;
+    }
+
+    .libras-card .emoji-grande {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .libras-card p {
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        font-size: 17px;
+      }
+
+      .grade {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        padding: 36px 16px 28px;
+      }
+
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      nav {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      nav a {
+        display: block;
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
+      }
+
+      .ferramentas button {
+        width: 100%;
+      }
+
+      .cartao,
+      .ferramentas,
+      .assistente-surdez,
+      .modal-conteudo {
+        padding: 22px 20px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      header h1 {
+        font-size: 1.4rem;
+      }
+
+      h2 {
+        font-size: 1.35rem;
+      }
+    }
+
+    .header-deco {
+      display: inline-block;
+      margin-bottom: 8px;
+      font-size: 2.2rem;
+      opacity: 0.95;
+    }
+  </style>
+</head>
+<body>
+    <div id="alertaVisual" class="alerta-visual" role="alert" aria-live="assertive"></div>
+
+    <!-- =========================================
+         TELA INICIAL: MODAL DE SELEÇÃO DE PERFIL
+         ========================================= -->
+    <div id="modalBoasVindas"
+         class="modal-overlay"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="modalTitulo"
+         aria-describedby="modalDescricao">
+      <div class="modal-conteudo">
+        <div class="modal-header">
+          <h2 id="modalTitulo" tabindex="0">♿ Bem-vindo ao Acesso para Todos!</h2>
+          <p id="modalDescricao" tabindex="0">
+            Qual é a sua necessidade ou preferência para personalizarmos a sua navegação agora?
+          </p>
+        </div>
+
+          <button type="button"
+                  class="btn-perfil padrao"
+                  onclick="selecionarPerfil('padrao')"
+                  aria-label="Navegação Padrão ou Continuar sem alterar: fecha a tela inicial e mantém a configuração padrão">
+            <span class="perfil-icone" aria-hidden="true">🌐</span>
+            <span class="perfil-texto">
+              <span class="perfil-titulo">Navegação Padrão / Continuar sem alterar</span>
+              <span class="perfil-desc">Fecha esta tela inicial e mantém o site na configuração padrão com leitura de voz disponível.</span>
+            </span>
+          </button>
+
+        <div class="modal-opcoes" role="group" aria-label="Opções de perfil de acessibilidade">
+          <button type="button"
+                  class="btn-perfil"
+                  onclick="selecionarPerfil('visual')"
+                  aria-label="Deficiência Visual: ativa alto contraste, aumenta a fonte para 22 pixels e mantém a leitura de voz ligada">
+            <span class="perfil-icone" aria-hidden="true">👁️</span>
+            <span class="perfil-texto">
+              <span class="perfil-titulo">Deficiência Visual</span>
+              <span class="perfil-desc">Ativa o modo Alto Contraste, aumenta a fonte para 22px e mantém a leitura de voz ligada.</span>
+            </span>
+          </button>
+
+          <button type="button"
+                  class="btn-perfil"
+                  onclick="selecionarPerfil('auditiva')"
+                  aria-label="Deficiência Auditiva: desativa a leitura de voz, exibe alerta visual e leva até o Assistente para Surdos">
+            <span class="perfil-icone" aria-hidden="true">👂</span>
+            <span class="perfil-texto">
+              <span class="perfil-titulo">Deficiência Auditiva</span>
+              <span class="perfil-desc">Desativa a leitura de voz, ativa alertas visuais e leva você ao Assistente para Surdos.</span>
+            </span>
+          </button>
+
+          <button type="button"
+                  class="btn-perfil"
+                  onclick="selecionarPerfil('motora')"
+                  aria-label="Deficiência Motora: aumenta o espaçamento e tamanho dos botões e destaca o foco do teclado">
+            <span class="perfil-icone" aria-hidden="true">🖐️</span>
+            <span class="perfil-texto">
+              <span class="perfil-titulo">Deficiência Motora</span>
+              <span class="perfil-desc">Aumenta o tamanho e espaçamento dos botões/links e reforça o destaque de foco do teclado.</span>
+            </span>
+          </button>
+
+          <button type="button"
+                  class="btn-perfil"
+                  onclick="selecionarPerfil('leitura')"
+                  aria-label="Dificuldade de Leitura: aumenta o texto para 20 pixels, amplia o espaçamento entre linhas e mantém a leitura de voz">
+            <span class="perfil-icone" aria-hidden="true">🧠</span>
+            <span class="perfil-texto">
+              <span class="perfil-titulo">Dificuldade de Leitura</span>
+              <span class="perfil-desc">Aumenta o texto para 20px, amplia o espaçamento entre linhas e mantém a leitura de voz ativada.</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <header>
+        <span class="header-deco" aria-hidden="true">♿🌐✨</span>
+        <h1>Acesso para Todos</h1>
+        <p> Um mundo digital mais acessível, inclusivo e conectado! ✨</p>
+    
+        <nav aria-label="Menu principal">
+          <a href="#cadastro">🤝 Seja Voluntário</a>
+          <a href="#assistente">🤟 Assistente Surdos</a>
+          <a href="#recursos">🛠️ Recursos</a>
+          <a href="#dicas">💡 Dicas</a>
+        </nav>
+      </header>
+    
+      <main id="inicio">
+    
+        <section class="ferramentas">
+          <h2>⚙️ Personalize o site</h2>
+          <p style="margin-top:-4px; font-size:0.95rem; opacity:0.8;">🎨 Ajuste a experiência de navegação de acordo com sua necessidade.</p>
+    
+          <button type="button" onclick="mudarTexto(2)">
+            🔍 Aumentar texto +
+          </button>
+    
+          <button type="button" onclick="mudarTexto(-2)">
+            🔎 Diminuir texto -
+          </button>
+    
+          <button type="button" onclick="contraste()"
+            id="botaoContraste"
+            aria-pressed="false">
+            ☯️ Alto contraste
+          </button>
+
+          <button type="button" onclick="alternarFala()" id="botaoFala" aria-pressed="true">
+            🔊 Leitura de voz: Ligada
+          </button>
+    
+          <button type="button" onclick="restaurar()">
+            🔄 Restaurar padrão
+          </button>
+
+          <button type="button"
+                  class="btn-reabrir-modal"
+                  onclick="abrirModalBoasVindas()"
+                  aria-label="Alterar perfil de acessibilidade: abre novamente a tela inicial de seleção">
+            ♿ Alterar perfil de acessibilidade
+          </button>
+    
+          <p id="aviso" aria-live="polite"></p>
+        </section>
+    
+        <section>
+          <h2>🌟 Inclusão começa com acesso</h2>
+          <p>
+            🌐 A internet deve ser acessível a todos!
+            Nosso objetivo é ajudar pessoas com deficiência
+            a navegar com mais autonomia 🧭, conforto 🛋️ e segurança 🛡️.
+          </p>
+        </section>
+
+        <section id="assistente" class="assistente-surdez">
+          <h2>🤟 Assistente para Surdos</h2>
+          <p>
+            💬 Um espaço pensado para comunicação por texto, com alertas visuais 🔔
+            e apoio à Língua Brasileira de Sinais 🇧🇷 (Libras).
+          </p>
+
+          <h3>💬 Chat de apoio por texto</h3>
+          <p style="font-size:0.9rem;">
+            🤖 Converse com nosso assistente virtual. Tudo é feito por escrito 📝,
+            sem depender de áudio 🔇.
+          </p>
+
+          <div class="chat-container">
+            <div class="chat-mensagens" id="chatMensagens" role="log" aria-live="polite">
+              <div class="mensagem assistente">
+                <span class="rotulo">🤖 Assistente</span>
+                Olá! 👋 Sou o assistente para surdos. Como posso ajudar você hoje? 🌟
+                Você pode digitar sua pergunta ✍️ ou usar os botões rápidos abaixo. 👇
+              </div>
+            </div>
+            <form class="chat-entrada" id="chatForm" autocomplete="off">
+              <label for="chatInput" style="position:absolute;left:-9999px;">Digite sua mensagem</label>
+              <input type="text" id="chatInput" placeholder="✍️ Digite sua mensagem..." autocomplete="off" required>
+              <button type="submit">🚀 Enviar</button>
+            </form>
+          </div>
+
+          <div class="botoes-rapidos">
+            <button type="button" data-pergunta="Como ativar o alto contraste?">☯️ Como ativar o alto contraste?</button>
+            <button type="button" data-pergunta="Como me cadastrar como voluntário?">🤝 Como me cadastrar?</button>
+            <button type="button" data-pergunta="O site tem suporte a Libras?">🤟 Suporte a Libras?</button>
+            <button type="button" data-pergunta="Quais recursos de acessibilidade existem?">🛠️ Recursos de acessibilidade</button>
+          </div>
+
+          <h3 style="margin-top:24px;">👐 Apoio em Libras</h3>
+          <div class="libras-area">
+            <div class="libras-card">
+              <span class="emoji-grande" aria-hidden="true">🎬</span>
+              <p><strong>Vídeos em Libras</strong><br>🎥 Em breve, tutoriais do site traduzidos para Libras.</p>
+            </div>
+            <div class="libras-card">
+              <span class="emoji-grande" aria-hidden="true">🖼️</span>
+              <p><strong>Glossário visual</strong><br>📖 Termos do site explicados com apoio visual.</p>
+            </div>
+            <div class="libras-card">
+              <span class="emoji-grande" aria-hidden="true">📝</span>
+              <p><strong>Comunicação escrita</strong><br>💬 Todo o conteúdo é acessível por texto.</p>
+            </div>
+          </div>
+
+          <h3 style="margin-top:24px;">🔔 Alertas visuais</h3>
+          <p style="font-size:0.9rem;">
+            ⚡ Em vez de sons, usamos alertas visuais para avisar sobre novidades 📰,
+            confirmações ✅ e mensagens importantes ⚠️.
+          </p>
+          <button type="button" onclick="mostrarAlertaVisual('Exemplo de alerta visual: cadastro confirmado! 🎉')">
+            🔔 Testar alerta visual
+          </button>
+        </section>
+
+        <section id="cadastro" class="cartao">
+          <h2>🤝 Cadastre-se como Voluntário</h2>
+          <p>❤️ Ajude-nos a testar páginas 🧪, criar conteúdos acessíveis 🎨 ou apoiar outros usuários 👥.</p>
+
+          <form id="formCadastro">
+            <div class="campo">
+              <label for="nome">👤 Nome Completo:</label>
+              <input type="text" id="nome" required placeholder="Digite seu nome completo">
+            </div>
+
+            <div class="campo">
+              <label for="email">📧 E-mail de Contato:</label>
+              <input type="email" id="email" required placeholder="seuemail@exemplo.com">
+            </div>
+
+            <div class="campo">
+              <label for="tipoApoio">🙋 Como prefere ajudar?</label>
+              <select id="tipoApoio" required>
+                <option value="">Selecione uma opção 👇</option>
+                <option value="Testes de Acessibilidade">🧪 Testes de Acessibilidade</option>
+                <option value="Criação de Conteúdo">✍️ Criação de Conteúdo</option>
+                <option value="Suporte Tecnológico">💻 Suporte Tecnológico</option>
+                <option value="Divulgação">📢 Divulgação da Causa</option>
+                <option value="Apoio em Libras">🤟 Apoio em Libras</option>
+              </select>
+            </div>
+
+            <button type="submit">✅ Finalizar Cadastro</button>
+            <p id="respostaCadastro" aria-live="polite" style="font-weight: bold; margin-top: 10px;"></p>
+        </form>
+
+        <hr>
+
+        <h3>📋 Voluntários Cadastrados</h3>
+        <ul id="listaVoluntarios" class="lista-cadastrados">
+        </ul>
+        </section>
+    
+        <section id="recursos">
+          <h2>🛠️ Recursos de acessibilidade</h2>
+    
+        <div class="grade">
+            <article class="cartao">
+              <h3>👁️ Deficiência visual</h3>
+              <p>
+                🔤 Textos ajustáveis, bom contraste ☯️ e
+                compatibilidade com leitores de tela 🔊.
+              </p>
+            </article>
+    
+            <article class="cartao">
+              <h3>👂 Deficiência auditiva</h3>
+              <p>
+                📝 Informações escritas, chat por texto 💬, alertas visuais 🔔
+                e apoio em Libras 🤟 para quem não pode ouvir áudios.
+              </p>
+            </article>
+    
+            <article class="cartao">
+              <h3>🖐️ Deficiência motora</h3>
+              <p>
+                🔘 Botões grandes e navegação por teclado ⌨️
+                facilitam o uso do site.
+              </p>
+            </article>
+    
+            <article class="cartao">
+              <h3>🧠 Dificuldade de leitura</h3>
+              <p>
+                📖 Frases simples, títulos claros 💡 e
+                instruções fáceis de compreender.
+              </p>
+            </article>
+          </div>
+        </section>
+    
+        <section id="dicas" class="cartao">
+          <h2>💡 Como navegar</h2>
+    
+          <ul>
+            <li>🔤 Use os botões para ajustar o texto.</li>
+            <li>☯️ Ative o alto contraste para melhorar a visualização.</li>
+            <li>⌨️ Pressione <strong>Tab</strong> para navegar sem usar o mouse.</li>
+            <li>↵ Pressione <strong>Enter</strong> para ativar botões e links.</li>
+            <li>🤟 Use o <strong>Assistente para Surdos</strong> para comunicação por texto.</li>
+          </ul>
+        </section>
+
+        <section class="cartao">
+            <h2>📬 Envie uma sugestão</h2>
+      
+            <form id="formulario">
+              <label for="mensagem">
+                💡 Como podemos melhorar o site?
+              </label>
+      
+              <textarea
+                id="mensagem"
+                rows="4"
+                required
+                style="margin-top:10px;"
+                placeholder="Escreva sua sugestão aqui... ✍️"
+              ></textarea>
+      
+              <button type="submit" style="margin-top:14px;">📤 Enviar sugestão</button>
+              <p id="resultado" aria-live="polite"></p>
+            </form>
+      
+            <p style="font-size:0.85rem; opacity:0.7; margin-top:12px;">
+              ℹ️ Este formulário é demonstrativo e não envia
+              informações para um servidor.
+            </p>
+          </section>
+      
+        </main>
+      
+        <footer>
+          <p>❤️ Acesso para Todos — acessibilidade e inclusão digital 🌐</p>
+        </footer>
+      
+        <script>
+          let tamanho = 18;
+          let falaAtiva = true;
+          let boasVindasFalada = false;
+
+          /* =========================================
+             CONTROLE DO MODAL DE BOAS-VINDAS E PERFIS
+             ========================================= */
+          const modalBoasVindas = document.getElementById("modalBoasVindas");
+
+          function abrirModalBoasVindas() {
+            modalBoasVindas.classList.remove("oculto");
+            document.body.style.overflow = "hidden";
+            vincularEventosDeFala();
+
+            const tituloModal = document.getElementById("modalTitulo");
+            if (tituloModal) {
+              tituloModal.focus();
+            }
+          }
+
+          function fecharModalBoasVindas() {
+            modalBoasVindas.classList.add("oculto");
+            document.body.style.overflow = "";
+          }
+
+          function definirEstadoFala(ligada) {
+            falaAtiva = ligada;
+            const btnFala = document.getElementById("botaoFala");
+
+            if (!falaAtiva) {
+              pararFala();
+              btnFala.textContent = "🔇 Leitura de voz: Desligada";
+              btnFala.setAttribute("aria-pressed", "false");
+            } else {
+              btnFala.textContent = "🔊 Leitura de voz: Ligada";
+              btnFala.setAttribute("aria-pressed", "true");
+            }
+          }
+
+          function limparModosPerfil() {
+            document.body.classList.remove("alto-contraste", "modo-motor", "modo-leitura");
+            document.getElementById("botaoContraste").setAttribute("aria-pressed", "false");
+            tamanho = 18;
+            document.body.style.fontSize = "";
+          }
+
+          function selecionarPerfil(perfil) {
+            limparModosPerfil();
+            const aviso = document.getElementById("aviso");
+
+            if (perfil === "visual") {
+              document.body.classList.add("alto-contraste");
+              document.getElementById("botaoContraste").setAttribute("aria-pressed", "true");
+              tamanho = 22;
+              document.body.style.fontSize = "22px";
+              definirEstadoFala(true);
+              aviso.textContent = "👁️ Perfil Deficiência Visual ativado: alto contraste, fonte 22px e leitura de voz ligada.";
+              fecharModalBoasVindas();
+              falarTexto("Perfil Deficiência Visual ativado. Alto contraste ligado e fonte aumentada para 22 pixels.");
+              document.getElementById("inicio").focus({ preventScroll: true });
+
+            } else if (perfil === "auditiva") {
+              definirEstadoFala(false);
+              aviso.textContent = "👂 Perfil Deficiência Auditiva ativado: leitura de voz desativada e alertas visuais ativos.";
+              fecharModalBoasVindas();
+              mostrarAlertaVisual("Bem-vindo! Perfil Deficiência Auditiva ativado. Você está no Assistente para Surdos. 🤟");
+              const secaoAssistente = document.getElementById("assistente");
+              if (secaoAssistente) {
+                secaoAssistente.scrollIntoView({ behavior: "smooth" });
+                setTimeout(() => {
+                  document.getElementById("chatInput")?.focus({ preventScroll: true });
+                }, 500);
+              }
+
+            } else if (perfil === "motora") {
+              document.body.classList.add("modo-motor");
+              definirEstadoFala(true);
+              aviso.textContent = "🖐️ Perfil Deficiência Motora ativado: botões ampliados e foco de teclado destacado.";
+              fecharModalBoasVindas();
+              falarTexto("Perfil Deficiência Motora ativado. Botões ampliados e foco de teclado destacado.");
+
+            } else if (perfil === "leitura") {
+              document.body.classList.add("modo-leitura");
+              tamanho = 20;
+              document.body.style.fontSize = "20px";
+              definirEstadoFala(true);
+              aviso.textContent = "🧠 Perfil Dificuldade de Leitura ativado: fonte 20px, maior espaçamento entre linhas e leitura de voz ligada.";
+              fecharModalBoasVindas();
+              falarTexto("Perfil Dificuldade de Leitura ativado. Texto em 20 pixels com maior espaçamento entre linhas.");
+
+            } else {
+              definirEstadoFala(true);
+              aviso.textContent = "🌐 Navegação padrão selecionada.";
+              fecharModalBoasVindas();
+              falarTexto("Navegação padrão selecionada. Bem-vindo ao site Acesso para Todos.");
+            }
+          }
+
+          /* Armadilha de foco (Focus Trap) no Modal para navegação via Tab */
+          modalBoasVindas.addEventListener("keydown", function(e) {
+            if (e.key !== "Tab") return;
+            const focaveis = modalBoasVindas.querySelectorAll(
+              'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            if (focaveis.length === 0) return;
+
+            const primeiro = focaveis[0];
+            const ultimo = focaveis[focaveis.length - 1];
+
+            if (e.shiftKey) {
+              if (document.activeElement === primeiro) {
+                e.preventDefault();
+                ultimo.focus();
+              }
+            } else {
+              if (document.activeElement === ultimo) {
+                e.preventDefault();
+                primeiro.focus();
+              }
+            }
+          });
+
+          /* =========================================
+             ALERTAS VISUAIS E VOLUNTÁRIOS
+             ========================================= */
+          function mostrarAlertaVisual(texto) {
+            const alerta = document.getElementById("alertaVisual");
+            if (!alerta) return;
+            alerta.textContent = "🔔 " + texto;
+            alerta.style.display = "block";
+            clearTimeout(window._alertaTimeout);
+            window._alertaTimeout = setTimeout(() => {
+              alerta.style.display = "none";
+            }, 4500);
+          }
+
+          const formCadastro = document.getElementById("formCadastro");
+          const listaVoluntarios = document.getElementById("listaVoluntarios");
+
+          function carregarVoluntarios() {
+            const voluntarios = JSON.parse(localStorage.getItem("voluntarios") || "[]");
+            listaVoluntarios.innerHTML = "";
+
+            if (voluntarios.length === 0) {
+              listaVoluntarios.innerHTML = "<li>📜 Nenhum voluntário cadastrado ainda.</li>";
+              vincularEventosDeFala();
+              return;
+            }
+
+            voluntarios.forEach(v => {
+              const li = document.createElement("li");
+              li.innerHTML = `👤 <strong>${v.nome}</strong> (${v.email}) — <em>${v.apoio}</em>`;
+              listaVoluntarios.appendChild(li);
+            });
+
+            vincularEventosDeFala();
+          }
+
+          formCadastro.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const nome = document.getElementById("nome").value;
+            const email = document.getElementById("email").value;
+            const apoio = document.getElementById("tipoApoio").value;
+
+            const novoVoluntario = { nome, email, apoio };
+            const voluntarios = JSON.parse(localStorage.getItem("voluntarios") || "[]");
+            voluntarios.push(novoVoluntario);
+
+            localStorage.setItem("voluntarios", JSON.stringify(voluntarios));
+
+            document.getElementById("respostaCadastro").textContent = "🎉 Cadastro realizado com sucesso!";
+            mostrarAlertaVisual("Cadastro realizado com sucesso! 🎉");
+            falarTexto("Cadastro realizado com sucesso!");
+            formCadastro.reset();
+            carregarVoluntarios();
+          });
+
+          /* =========================================
+             FERRAMENTAS DE ACESSIBILIDADE
+             ========================================= */
+          function mudarTexto(valor) {
+            tamanho = Math.max(12, Math.min(32, tamanho + valor));
+            document.body.style.fontSize = tamanho + "px";
+            const msg = "Tamanho do texto: " + tamanho + " pixels.";
+            document.getElementById("aviso").textContent = "📏 " + msg;
+            falarTexto(msg);
+          }
+      
+          function contraste() {
+            const ativo = document.body.classList.toggle("alto-contraste");
+            document.getElementById("botaoContraste")
+              .setAttribute("aria-pressed", String(ativo));
+            const msg = ativo ? "Alto contraste ativado." : "Alto contraste desativado.";
+            document.getElementById("aviso").textContent = "☯️ " + msg;
+            falarTexto(msg);
+          }
+
+          function alternarFala() {
+            definirEstadoFala(!falaAtiva);
+            if (!falaAtiva) {
+              document.getElementById("aviso").textContent = "🔇 Leitura de voz desativada.";
+            } else {
+              document.getElementById("aviso").textContent = "🔊 Leitura de voz ativada.";
+              falarTexto("Leitura de voz ativada.");
+            }
+          }
+      
+          function restaurar() {
+            limparModosPerfil();
+            definirEstadoFala(true);
+            document.getElementById("aviso").textContent = "🔄 Configurações restauradas.";
+            falarTexto("Configurações restauradas para o padrão.");
+          }
+      
+          document.getElementById("formulario")
+            .addEventListener("submit", function(event) {
+              event.preventDefault();
+              const campoMensagem = document.getElementById("mensagem");
+              document.getElementById("resultado").textContent =
+                "✅ Sugestão recebida com sucesso!";
+              mostrarAlertaVisual("Sugestão recebida (demonstração). 📩");
+              falarTexto("Sugestão recebida com sucesso!");
+              campoMensagem.value = "";
+            });
+
+          /* =========================================
+             SÍNTESE DE VOZ (TTS) E EVENTOS DE LEITURA
+             ========================================= */
+          function falarTexto(texto) {
+            if (!falaAtiva) return;
+
+            if ('speechSynthesis' in window) {
+              window.speechSynthesis.cancel();
+
+              if (!texto || texto.trim() === '') return;
+
+              const mensagem = new SpeechSynthesisUtterance(texto);
+              mensagem.lang = 'pt-BR';
+              mensagem.rate = 1.15;
+              
+              window.speechSynthesis.speak(mensagem);
+            }
+          }
+
+          function pararFala() {
+            if ('speechSynthesis' in window) {
+              window.speechSynthesis.cancel();
+            }
+          }
+
+          function obterTextoParaFala(elemento) {
+            return elemento.getAttribute('aria-label') || elemento.innerText;
+          }
+
+          function tratarLeituraElemento(e) {
+            e.stopPropagation();
+            falarTexto(obterTextoParaFala(e.currentTarget));
+          }
+
+          function vincularEventosDeFala() {
+            const elementosDeTexto = document.querySelectorAll(
+              'h1, h2, h3, p, a, button, li, label, #modalTitulo, #modalDescricao'
+            );
+
+            elementosDeTexto.forEach(elemento => {
+              elemento.removeEventListener('mouseenter', tratarLeituraElemento);
+              elemento.removeEventListener('mouseleave', pararFala);
+              elemento.removeEventListener('focus', tratarLeituraElemento);
+              elemento.removeEventListener('blur', pararFala);
+
+              elemento.addEventListener('mouseenter', tratarLeituraElemento);
+              elemento.addEventListener('mouseleave', pararFala);
+              elemento.addEventListener('focus', tratarLeituraElemento);
+              elemento.addEventListener('blur', pararFala);
+            });
+          }
+
+          /* Desbloqueia e dispara boas-vindas por voz na primeira interação (clique ou tecla) */
+          function dispararBoasVindasInicial(e) {
+            if (boasVindasFalada || !falaAtiva) return;
+            boasVindasFalada = true;
+
+            window.removeEventListener("pointerdown", dispararBoasVindasInicial);
+            window.removeEventListener("keydown", dispararBoasVindasInicial);
+
+            if (!modalBoasVindas.classList.contains("oculto")) {
+              const focoAtual = document.activeElement;
+              if (focoAtual && modalBoasVindas.contains(focoAtual) && focoAtual !== document.body) {
+                falarTexto("Bem-vindo ao Acesso para Todos. " + obterTextoParaFala(focoAtual));
+              } else {
+                falarTexto(
+                  "Bem-vindo ao Acesso para Todos! Qual é a sua necessidade ou preferência para personalizarmos a sua navegação? Use a tecla Tab para ouvir as opções."
+                );
+              }
+            }
+          }
+
+          /* =========================================
+             CHAT ASSISTENTE PARA SURDOS
+             ========================================= */
+          const chatMensagens = document.getElementById("chatMensagens");
+          const chatForm = document.getElementById("chatForm");
+          const chatInput = document.getElementById("chatInput");
+
+          const respostasAssistente = [
+            {
+              chaves: ["alto contraste", "contraste"],
+              resposta: "Para ativar o alto contraste, clique no botão 'Alto contraste' ☯️ na seção 'Personalize o site'. O fundo ficará preto e o texto neon, facilitando a leitura."
+            },
+            {
+              chaves: ["cadastr", "volunt"],
+              resposta: "Para se cadastrar como voluntário, vá até a seção 'Cadastre-se como Voluntário' 🤝, preencha nome, e-mail e escolha como prefere ajudar. Depois clique em 'Finalizar Cadastro' ✅."
+            },
+            {
+              chaves: ["libras"],
+              resposta: "Sim! 🤟 O site tem uma seção 'Assistente para Surdos' com apoio em Libras, chat por texto e alertas visuais. Em breve teremos vídeos em Libras 🎬."
+            },
+            {
+              chaves: ["surdo", "surdez", "auditiv"],
+              resposta: "Temos um assistente dedicado a usuários surdos 🤟, com comunicação 100% por texto 💬, alertas visuais 🔔 e apoio em Libras. Você está nele agora! 😊"
+            },
+            {
+              chaves: ["recurso", "acessibilidade"],
+              resposta: "Os recursos incluem: texto ajustável 🔍, alto contraste ☯️, leitura de voz 🔊, chat por texto para surdos 💬, alertas visuais 🔔 e navegação por teclado ⌨️."
+            },
+            {
+              chaves: ["texto", "fonte", "tamanho"],
+              resposta: "Você pode aumentar ou diminuir o texto usando os botões 'Aumentar texto +' 🔍 e 'Diminuir texto -' 🔎 na seção 'Personalize o site'."
+            },
+            {
+              chaves: ["voz", "fala", "áudio", "audio"],
+              resposta: "A leitura de voz pode ser ligada 🔊 ou desligada 🔇 no botão 'Leitura de voz' na seção 'Personalize o site'."
+            },
+            {
+              chaves: ["sugestão", "feedback", "comentário"],
+              resposta: "Você pode enviar sugestões usando o formulário na seção 'Envie uma sugestão' 📬. Ele é apenas demonstrativo e não envia informações para um servidor."
+            }
+          ];
+
+          function adicionarMensagem(texto, tipo) {
+            const div = document.createElement("div");
+            div.className = `mensagem ${tipo}`;
+            
+            const rotulo = document.createElement("span");
+            rotulo.className = "rotulo";
+            rotulo.textContent = tipo === "usuario" ? "👤 Você" : "🤖 Assistente";
+            
+            div.appendChild(rotulo);
+            div.appendChild(document.createTextNode(texto));
+            
+            chatMensagens.appendChild(div);
+            chatMensagens.scrollTop = chatMensagens.scrollHeight;
+          }
+
+          function processarMensagem(texto) {
+            const textoMin = texto.toLowerCase();
+            let respostaEncontrada = "Obrigado por contactar! 🌟 Para dúvidas específicas, pode navegar pelas secções do site 🌐 ou usar os botões de perguntas rápidas. 👇";
+
+            for (const item of respostasAssistente) {
+              if (item.chaves.some(chave => textoMin.includes(chave))) {
+                respostaEncontrada = item.resposta;
+                break;
+              }
+            }
+
+            setTimeout(() => {
+              adicionarMensagem(respostaEncontrada, "assistente");
+              falarTexto(respostaEncontrada);
+            }, 400);
+          }
+
+          chatForm.addEventListener("submit", function(e) {
+            e.preventDefault();
+            const texto = chatInput.value.trim();
+            if (!texto) return;
+
+            adicionarMensagem(texto, "usuario");
+            chatInput.value = "";
+            processarMensagem(texto);
+          });
+
+          document.querySelectorAll(".botoes-rapidos button").forEach(btn => {
+            btn.addEventListener("click", function() {
+              const pergunta = this.getAttribute("data-pergunta");
+              if (pergunta) {
+                adicionarMensagem(pergunta, "usuario");
+                processarMensagem(pergunta);
+              }
+            });
+          });
+
+          /* =========================================
+             INICIALIZAÇÃO
+             ========================================= */
+          window.addEventListener("DOMContentLoaded", () => {
+            carregarVoluntarios();
+            vincularEventosDeFala();
+            abrirModalBoasVindas();
+
+            // Tenta falar imediatamente caso o navegador permita áudio sem gesto prévio
+            falarTexto(
+              "Bem-vindo ao Acesso para Todos! Qual é a sua necessidade ou preferência para personalizarmos a sua navegação?"
+            );
+
+            // Garante a fala na primeira interação caso o navegador bloqueie o autoplay
+            window.addEventListener("pointerdown", dispararBoasVindasInicial);
+            window.addEventListener("keydown", dispararBoasVindasInicial);
+          });
+        </script>
+</body>
+</html>
+
+```
